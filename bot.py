@@ -9,7 +9,7 @@ from datetime import datetime
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 import telegram
 
-def getir(hisse):
+def getir(hisse): #write dde links on excel
     wb = openpyxl.load_workbook('Template.xlsm', keep_vba=True)
     ws = wb.active
     ws["A1"] = hisse.upper()
@@ -35,21 +35,21 @@ def getir(hisse):
 
 
 # Defining the bot
-TOKEN: Final = '7142748982:AAGpGID8L-l5MuuySLvlf_o-6w9DN1SPfn4'
-BOT_USERNAME: Final = '@xTicaretBorsa'
-allowed_chat_id = "-1002055170403"
+TOKEN: Final = 'YOUR TOKEN HERE'
+BOT_USERNAME: Final = '@YOUR BOT NAME'
+allowed_chat_id = "" #if you want make the bot private
 
-async def derinlik(update, context):
+async def derinlik(update, context): #wait for a command
 
     hisse = " ".join(context.args)
     chat_id = update.message.chat_id
-    if str(chat_id) == allowed_chat_id:
+    if str(chat_id) == allowed_chat_id: #you should change this part if you dont want a private bot
         if hisse != "":
             await update.message.reply_text(hisse.upper() + " derinlik sorgulaması sıraya eklendi.")
             getir(hisse)
 
             time.sleep(2)
-            os.system("start EXCEL.EXE Result.xlsm")
+            os.system("start EXCEL.EXE Result.xlsm") #This part is essential, the excel file must be opened, saved and closed in order to update dde link values.
             time.sleep(18)
             os.system('taskkill /T /IM EXCEL.exe')
             time.sleep(3)
@@ -64,7 +64,7 @@ async def derinlik(update, context):
                     if type(globals()[var_name]) == "str":
                         await update.message.reply_text("Bir sorun oluştu, girdiğiniz hissenin derinlik verisi artık okunamıyor olabilir. Lütfen geliştirici ile iletişime geçin.")
                     elif int(globals()[var_name]) == df.iloc[i, j]:
-                        globals()[var_name] = int(globals()[var_name])
+                        globals()[var_name] = int(globals()[var_name]) #pandas reads dde links as numbers
 
 
             wab = openpyxl.load_workbook('Template.xlsm', keep_vba=True)
@@ -72,7 +72,7 @@ async def derinlik(update, context):
             for i in range(len(df)):
                 for j in range(len(df.columns)):
                     var_name = f'{chr(65 + j)}{i + 3}'
-                    was[str(var_name)]=globals()[var_name]
+                    was[str(var_name)]=globals()[var_name]  #writing values as numbers
             now = datetime.today()
             was["A1"] = str(hisse.upper())
             was["B1"] = str(now.day) + "/" + str(now.month)+ "/" + str(now.year)
@@ -91,6 +91,8 @@ async def derinlik(update, context):
         await update.message.reply_text("Bu botu yalnızca xTicaret Vip üyeleri kullanabilir. Daha fazla bilgi için ziyaret et @xticaretdestek")
        
 
+
+#starting
 
 if __name__ == '__main__':
     app = Application.builder().token(TOKEN).build()
